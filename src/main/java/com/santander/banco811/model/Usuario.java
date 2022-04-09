@@ -27,7 +27,7 @@ public class Usuario {
     @Column(name = "senha", nullable = false)
     private String senha;
 
-    @Column(name = "data_cricao")
+    @Column(name = "data_criacao")
     @CreatedDate
     private LocalDateTime dataCriacao;
 
