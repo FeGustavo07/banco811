@@ -1,5 +1,7 @@
 package com.santander.banco811.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.santander.banco811.dto.conta.ContaRequest;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,6 +12,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Table(name = "conta")
 @Entity
@@ -27,7 +30,7 @@ public class Conta {
     @Column(name = "agencia", nullable = false)
     private Integer agencia;
 
-    @Column(name = "data_cricao")
+    @Column(name = "data_criacao")
     @CreatedDate
     private LocalDateTime dataCriacao;
 
@@ -42,8 +45,22 @@ public class Conta {
     @Enumerated(EnumType.STRING)
     private TipoConta tipoConta;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "usuario_id", referencedColumnName = "id")
     private Usuario usuario;
+
+    @OneToMany(mappedBy = "conta", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Transacao> transacoes;
+
+    public Conta(ContaRequest contaRequest) {
+        this.tipoConta = contaRequest.getTipoConta();
+        this.saldo = contaRequest.getSaldo();
+        this.dataCriacao = contaRequest.getDataCriacao();
+        this.dataAtualizacao = contaRequest.getDataAtualizacao();
+        this.usuario = new Usuario(contaRequest.getUsuario());
+        this.numero = contaRequest.getNumero();
+        this.agencia = contaRequest.getAgencia();
+    }
 
 }
